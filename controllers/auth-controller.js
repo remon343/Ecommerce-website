@@ -1,4 +1,5 @@
 const User = require("../models/user-model");
+
 const home = async (req, res) => {
   try {
     res.status(200).send("Hello from auth-controller");
@@ -9,18 +10,25 @@ const home = async (req, res) => {
 
 const register = async (req, res) => {
   try {
-    const { fullName, email, password, address, phone, gender } = req.body;
+    const { fullName, email, password, address, phone, gender} = req.body;
+    let profileImage  = null;
+    if(req.file){
+      profileImage = req.file.path;
+      
+    }
     const userExist = await User.findOne({ email });
     if (userExist) {
       return res.status(400).send({ msg: "User already exist" });
     }
-    const user = await User.create({
+    console.log(profileImage);
+    const user = await User.create({  
       fullName,
       email,
       password,
       address,
       phone,
       gender,
+      profileImage
     });
     res.status(200).json({
       user,
@@ -28,7 +36,7 @@ const register = async (req, res) => {
       userId: user._id.toString(),
     });
   } catch (err) {
-    res.status(404).send({ msg: err.message });
+    res.status(500).send({ msg: err.message });
   }
 };
 

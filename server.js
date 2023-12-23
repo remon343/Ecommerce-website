@@ -6,20 +6,25 @@ const productRouter = require("./router/product-route");
 const orderRouter = require("./router/order-route");
 const cartRouter = require("./router/cart-route");
 const connectDB = require("./utils/db");
+const cors = require("cors");
 
 dotenv.config();
 const app = express();
+const corsOptions = {
+  origin: "http://localhost:5173",
+  credentials: true,
+};
+app.use(cors(corsOptions));
+
+// app.use(bodyParser.json({ limit: "50mb" }));
+// app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 
 app.use(express.json());
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
 app.use("/api/product", productRouter);
 app.use("/api/order", orderRouter);
-app.use("/api/cart", cartRouter)
-
-app.get("/", (req, res) => {
-  res.status(200).send("Hello World");
-});
+app.use("/api/cart", cartRouter);
 
 connectDB().then(() => {
   const port = process.env.PORT;
