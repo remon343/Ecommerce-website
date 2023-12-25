@@ -7,6 +7,7 @@ const orderRouter = require("./router/order-route");
 const cartRouter = require("./router/cart-route");
 const connectDB = require("./utils/db");
 const cors = require("cors");
+const errorMiddleware = require("./middlewares/error-middleware");
 
 dotenv.config();
 const app = express();
@@ -16,10 +17,8 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
-// app.use(bodyParser.json({ limit: "50mb" }));
-// app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
-
 app.use(express.json());
+app.use(errorMiddleware);
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
 app.use("/api/product", productRouter);

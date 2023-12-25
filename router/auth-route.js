@@ -1,29 +1,17 @@
 const express = require("express");
 const router = express.Router();
 const authControllers = require("../controllers/auth-controller");
-const multer = require("multer");
-const path = require("path");
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) =>{
-    cb(null, path.join(__dirname,'../public/uploads'));
-  },
-  filename: function (req, file, cb) {
-    cb(
-      null,
-      file.fieldname + "_" + Date.now() + path.extname(file.originalname)
-    );
-  },
-});
-const upload = multer({
-  storage: storage,
-  limits: { fileSize: 1024 * 1024 * 5 },
-}).single("profileImage");
+const validate = require("../middlewares/validate-middleware");
+const registerSchema = require("../validators/register-auth-validate");
+const loginSchema = require("../validators/login-auth-validate");
+const upload = require("../middlewares/upload-middleware");
+const authenticateToken = require("../middlewares/authenticatetoken-middleware");
 
 router.route("/").get(authControllers.home);
-
-router.route("/register").post(upload, authControllers.register);
-
-router.route("/login").post(authControllers.login);
+router
+  .route("/register")
+  .post(upload, validate(registerSchema), authControllers.register);
+router.route("/login").post(validate(loginSchema), authControllers.login);
+router.route("/user").get(authenticateToken, authControllers.user);
 
 module.exports = router;
