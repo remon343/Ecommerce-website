@@ -1,20 +1,25 @@
 const jwt = require("jsonwebtoken"); // npm i jsonwebtoken
-const authenticateToken = (req, res, next) => {
+const dotenv = require("dotenv"); // npm i dotenv
+const User = require("../models/user-model");
+dotenv.config();
+const authenticateToken = async (req, res, next) => {
     try {
-      const authHeader = req.headers["authorization"];
-      const token = authHeader && authHeader.split(" ")[1];
+      const authHeader = req.headers(authorization);
+      const token = authHeader.split(" ")[1];
       if (!token) {
         throw new Error("Token not found");
       }
-      jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-        if (err) {
-          throw new Error("Invalid Token");
-        }
-        req.user = user;
-        next();
-      });
+      const isVerified = jwt.verify(token, process.env.JWT_SECRET);
+      if(!isVerified){
+          throw new Error("Token verification failed");
+      }
+      const userData = await User.findOne({email : isVerified.email}).select("-password");
+      req.user = userData;
+      req.token = token;
+      req.userId = isVerified._id.toString();
+      next();
     } catch (err) {
-      next(err);
+      res.status(500).json({ msg: err.message });
     }
   };
 

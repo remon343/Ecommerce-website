@@ -5,7 +5,7 @@ const home = async (req, res) => {
   try {
     res.status(200).send("Hello from auth-controller");
   } catch (err) {
-    res.status(404).send({ msg: err.message });
+    res.status(404).json({ msg: err.message });
     next(err);
   }
 };
@@ -13,9 +13,11 @@ const home = async (req, res) => {
 const user = async (req, res) => {
   // give user data according to the token which comes with Authorization header
   try {
-    res.json(req.user);
+    console.log(req.user);
+    const userData = req.user;
+    return res.status(200).json({msg : userData});
   } catch (err) {
-    res.status(500).send({ msg: err.message });
+    res.status(500).json({ msg: err.message });
   }
 };
 
@@ -72,7 +74,7 @@ const login = async (req, res) => {
       });
     }
   } catch (err) {
-    res.status(500).send({ msg: err.message });
+    res.status(500).json({ msg: err.message });
   }
 };
 
